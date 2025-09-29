@@ -14,7 +14,7 @@ public class DateTools {
         }
     }
 
-    public class RelativeDate {
+    public static class RelativeDate {
 
         public RelativeDate(int mn, int hh, int dd, int mo, int yy) {
             this.mn = mn || 0;
@@ -25,7 +25,7 @@ public class DateTools {
         }
     }
 
-    public enum TimeZone {
+    public static enum TimeZone {
         AmericaLos_Angeles,
         AmericaChicago,
         AmericaNew_York,
