@@ -1,234 +1,78 @@
-import java.util.HashMap;
+public class Date extends RelativeDate {
+    // int Unix can only represent until 2038 -- have to use long after that
 
-public class Date {
+    /*
+     * Overloaded constructors
+     */
 
-    public int Minutes;
-    public int Hours;
-    public int Days;
-    public int Months;
-    public int Years;
-    public TimeZones TimeZone;
-
-    public Date(int mn, int hh, int dd, int mo, int yy, TimeZones tz) {
-        this.Minutes = mn;
-        this.Hours = hh;
-        this.Days = dd;
-        this.Months = mo;
-        this.Years = yy;
-        this.TimeZone = tz;
-        if (!checkValidity())
-            throw new IllegalArgumentException("Invalid Date parameters");
+    public Date(int mn, int hh, int dd, int mo, int yy) {
+        super(mn, hh, dd, mo, yy); // Since relativeDate already has constructors, we can use the same ones
+        // The only difference is the year, which is handled by the calculateComponents
+        // and calculateUnix methods
+        // We do have to redefine constructors, however, since Java only automatically
+        // calls constructors when they take no arguments
     }
 
-    public Date(int dd, int mo, int yy, TimeZones tz) {
-        this.Minutes = 0;
-        this.Hours = 0;
-        this.Days = dd;
-        this.Months = mo;
-        this.Years = yy;
-        this.TimeZone = tz;
-        if (!checkValidity())
-            throw new IllegalArgumentException("Invalid Date parameters");
+    public Date(String mn, String hh, String dd, String mo, String yy) {
+        super(mn, hh, dd, mo, yy);
     }
 
-    public Date(int mn, int hh, TimeZones tz) {
-        this.Minutes = mn;
-        this.Hours = hh;
-        this.Days = 0;
-        this.Months = 0;
-        this.Years = 0;
-        this.TimeZone = tz;
-        if (!checkValidity())
-            throw new IllegalArgumentException("Invalid Date parameters");
+    public Date(int dd, int mo, int yy) {
+        super(dd, mo, yy);
     }
 
-    private boolean checkValidity() {
-        if (this.Minutes < 0 || this.Minutes > 59)
-            return false;
-        if (this.Hours < 0 || this.Hours > 23)
-            return false;
-        if (this.Days < 0 || this.Days > 31)
-            return false;
-        if (this.Months < 0 || this.Months > 12)
-            return false;
-        return true;
+    public Date(int mn, int hh) {
+        super(mn, hh);
     }
 
-    public static class RelativeDate {
-
-        public int Minutes;
-        public int Hours;
-        public int Days;
-        public int Months;
-        public int Years;
-
-        public RelativeDate(int mn, int hh, int dd, int mo, int yy) {
-            this.Minutes = mn;
-            this.Hours = hh;
-            this.Days = dd;
-            this.Months = mo;
-            this.Years = yy;
-            if (!checkValidity())
-                throw new IllegalArgumentException("Invalid RelativeDate parameters");
-        }
-
-        public RelativeDate(int mn, int hh) {
-            this.Minutes = mn;
-            this.Hours = hh;
-            this.Days = 0;
-            this.Months = 0;
-            this.Years = 0;
-            if (!checkValidity())
-                throw new IllegalArgumentException("Invalid RelativeDate parameters");
-        }
-
-        public RelativeDate(int dd, int mo, int yy) {
-            this.Minutes = 0;
-            this.Hours = 0;
-            this.Days = dd;
-            this.Months = mo;
-            this.Years = yy;
-            if (!checkValidity())
-                throw new IllegalArgumentException("Invalid RelativeDate parameters");
-        }
-
-        private boolean checkValidity() {
-            if (this.Minutes < -59 || this.Minutes > 59)
-                return false;
-            if (this.Hours < -23 || this.Hours > 23)
-                return false;
-            if (this.Days < -31 || this.Days > 31)
-                return false;
-            if (this.Months < -12 || this.Months > 12)
-                return false;
-            return true;
-        }
+    public Date(int unix) {
+        super(unix);
     }
 
-    public static enum TimeZones {
-        AmericaLos_Angeles,
-        AmericaChicago,
-        AmericaNew_York,
-        EuropeLondon,
-        AfricaAccra,
-        EuropeBerlin,
-        EuropeAthens,
-        EuropeKyiv,
-        AsiaAmman,
-        AsiaDubai,
-        AsiaKolkata,
-        AsiaShanghai,
-        AsiaSeoul,
-        AustraliaSydney,
+    public Date(String unix) {
+        super(unix);
     }
 
-    // AI suggested double brace syntax, which I then looked up and understood
-    // Used AI to figure out the proper syntax for the declaring an array consisting
-    // of custom objects
+    /*
+     * Private utility functions that help convert between Unix and Component Date
+     * forms
+     */
 
-    private static final HashMap<TimeZones, RelativeDate[]> tzOffsets = new HashMap<TimeZones, RelativeDate[]>() {
-        {
-            put(TimeZones.AmericaLos_Angeles, new RelativeDate[] { new RelativeDate(0, -8), new RelativeDate(0, -7) });
-            put(TimeZones.AmericaChicago, new RelativeDate[] { new RelativeDate(0, -6), new RelativeDate(0, -5) });
-            put(TimeZones.AmericaNew_York, new RelativeDate[] { new RelativeDate(0, -5), new RelativeDate(0, -4) });
-            put(TimeZones.EuropeLondon, new RelativeDate[] { new RelativeDate(0, 0), new RelativeDate(0, 1) });
-            put(TimeZones.AfricaAccra, new RelativeDate[] { new RelativeDate(0, 0), new RelativeDate(0, 0) });
-            put(TimeZones.EuropeBerlin, new RelativeDate[] { new RelativeDate(0, 1), new RelativeDate(0, 2) });
-            put(TimeZones.EuropeAthens, new RelativeDate[] { new RelativeDate(0, 2), new RelativeDate(0, 3) });
-            put(TimeZones.EuropeKyiv, new RelativeDate[] { new RelativeDate(0, 2), new RelativeDate(0, 3) });
-            put(TimeZones.AsiaAmman, new RelativeDate[] { new RelativeDate(0, 3), new RelativeDate(0, 3) });
-            put(TimeZones.AsiaDubai, new RelativeDate[] { new RelativeDate(0, 4), new RelativeDate(0, 4) });
-            put(TimeZones.AsiaKolkata, new RelativeDate[] { new RelativeDate(30, 5), new RelativeDate(30, 5) });
-            put(TimeZones.AsiaShanghai, new RelativeDate[] { new RelativeDate(0, 8), new RelativeDate(0, 8) });
-            put(TimeZones.AsiaSeoul, new RelativeDate[] { new RelativeDate(0, 9), new RelativeDate(0, 9) });
-            put(TimeZones.AustraliaSydney, new RelativeDate[] { new RelativeDate(0, 10), new RelativeDate(0, 11) });
-        }
-    };
-
-    // private static final HashMap<TimeZones, Date[]> tzDST = newHashMap<TimeZones,
-    // Date[]>()
-    // {
-    // {
-
-    // }
-    // }
-    //
-    // This is when I realized that America switches it on SUNDAYS and not on a
-    // fixed date, and other countries do (slightly less) weird things too
-    // so I gave up on implementing DST support
-
-    private Date fixUTC() {
-        RelativeDate offset = tzOffsets.get(this.TimeZone)[1];
-        return this.addTime(offset);
+    @Override
+    protected void calculateComponents() {
+        super.calculateComponents();
+        this.Years += 1970;
     }
 
-    public long unix() {
-        Date epoch = new Date(0, 0, 1, 1, 1970, TimeZones.EuropeLondon);
-        RelativeDate diff = this.difference(epoch);
-        return diff.Minutes * 60 + diff.Hours * 3600 + (diff.Days - 1) * 86400 + diff.Months * 2592000
-                + diff.Years * 31536000;
+    @Override
+    protected void calculateUnix() { // Initially used super method by changing this.Years, but found it easier to
+                                     // handle Leap
+        this.Years -= 1970;
+        super.calculateUnix(); // A more accurate method would require using 1900 and 1968 for last leap
+                               // year occurance before 1970
+        this.Years += 1970;
     }
 
-    private static final int[] monthDays = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    /*
+     * Private utility function to verify input validity
+     */
 
-    private static int calculateTotalDays(int month) {
-        for (int i = 0; i < month - 1; i++) {
-            month += monthDays[i];
-        }
+    protected boolean checkValidity() {
+        this.Days -= 1;
+        this.Months -= 1; // Months are valid from 00 to 11, not 01 to 12
+        this.Years -= 1970;
+        boolean validity = super.checkValidity();
+        this.Days += 1;
+        this.Months += 1;
+        this.Years += 1970;
+        return validity;
+    }
+
+    public Date add(RelativeDate difference) {
+        return new Date(this.getUnix() + difference.getUnix());
     }
 
     public RelativeDate difference(Date secondDate) {
-        RelativeDate diff = new RelativeDate(0, 0, 0, 0, 0);
-        diff.Minutes = this.Minutes - secondDate.Minutes;
-        if (diff.Minutes < 0) {
-            diff.Minutes += 60;
-            diff.Hours -= 1;
-        }
-        diff.Hours = this.Hours - secondDate.Hours;
-        if (diff.Hours < 0) {
-            diff.Hours += 24;
-            diff.Days -= 1;
-        }
-        diff.Days = this.Days - secondDate.Days;
-        if (diff.Days < 0) {
-            diff.Days += monthDays[this.Months - 2];
-            diff.Months -= 1;
-        }
-        diff.Months = this.Months - secondDate.Months;
-        if (diff.Months < 0) {
-            diff.Months += 12;
-            diff.Years -= 1;
-        }
-        diff.Years = this.Years - secondDate.Years;
-        if (diff.Years < 0) {
-            return secondDate.difference(this);
-        }
-        return diff;
-    }
-
-    public Date addTime(RelativeDate diff) {
-        Date newDate = this;
-        newDate.Minutes += diff.Minutes;
-        if (newDate.Minutes >= 60) {
-            newDate.Hours += 1;
-            newDate.Minutes -= 60;
-        }
-        newDate.Hours += diff.Hours;
-        if (newDate.Hours >= 24) {
-            newDate.Days += 1;
-            newDate.Hours -= 24;
-        }
-        newDate.Days += diff.Days;
-        if (newDate.Days > monthDays[newDate.Months - 1]) {
-            newDate.Months += 1;
-            newDate.Days -= monthDays[newDate.Months - 2];
-        }
-        newDate.Months += diff.Months;
-        if (newDate.Months > 12) {
-            newDate.Years += 1;
-            newDate.Months -= 12;
-        }
-        newDate.Years += diff.Years;
-        return newDate;
+        return new RelativeDate(Math.abs(this.getUnix() - secondDate.getUnix()));
     }
 }
